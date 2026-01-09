@@ -1,0 +1,6 @@
+.venv
+ann_demo/artifacts/
+ann_demo/data/
+ann_demo/src/ann_demo.egg-info/
+ann_demo/src/ann_demo/__pycache__/
+ann_demo/.venv/
