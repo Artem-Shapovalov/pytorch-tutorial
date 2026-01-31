@@ -97,7 +97,7 @@ $(.venv)> deactivate
 
 See the loss is decreasing.
 
-# Minimal production-ready application
+# Simlpe classifier project
 
 ## The problem brief
 
@@ -132,7 +132,7 @@ Each login attempt is represented as a fixed-size numeric vector:
 
 These features are produced entirely by application code. The neural network operates purely on numeric input and has no knowledge of their semantic meaning.
 
-## The demo project
+## The project
 
 ### Structure
 
@@ -436,3 +436,57 @@ $ann_demo(.venv)> python -m ann_demo.infer
 ```
 
 `generate_data.py` creates separate training and validation CSV files. `ann_demo.train` reads the training data, computes scaling coefficients, trains the model, evaluates it on the validation dataset, and saves a checkpoint into `artifacts/`. `ann_demo.infer` loads the checkpoint, applies the same scaling rules, and produces a risk score for sample inputs.
+
+# Simple machine view project
+
+## The problem brief
+
+This project demonstrates a small on-device computer-vision feature: warning the driver when a red traffic light is detected while the car is still moving, and producing a subtle sound when the light turns green after a stop. The task is intentionally narrow. It does not attempt to interpret traffic law or replace the driver’s judgment.
+
+Despite its simplicity, the problem reflects real-world constraints: imperfect visual input, ambiguity, latency, and the need for careful user feedback. For educational purposes, it provides a realistic scale. The focus of the project is not the feature itself, but the process of building a working vision system from raw data to a running mobile application.
+
+The system uses a two-stage neural network pipeline. First, a detector searches the image for traffic-light devices and marks their location. Second, a classifier determines the state of the detected light, such as red or green.
+
+Both stages operate on individual images. Temporal behavior is handled outside the neural network using simple state logic. Because the model does not analyze video sequences directly, behaviors such as blinking yellow lights are intentionally out of scope.
+
+The project emphasizes the full workflow. We gather raw visual data, create and annotate a small dataset, and train the models using PyTorch. Before moving to mobile, the system is validated in a desktop Python demo with live visualization of detections.
+
+Only after the behavior is understood and stable is the model exported and embedded into an Android application. The final app runs entirely on-device via ONNX and implements the original notification logic.
+
+The dataset is built from openly licensed stock footage and dashcam-style videos that permit reuse. No proprietary sources are used. Dataset creation is treated as a first-class part of the project, reflecting a skill that is essential in real-world machine-learning work.
+
+## Working principles
+
+![Conceptual pipeline](cv_demo/conceptual-pipeline.png)
+
+| Detector                       | Typical objects                                                    | Troubles with                          |
+|--------------------------------|--------------------------------------------------------------------|----------------------------------------|
+| Faster R-CNN                   | animals in clutter, tools on workbench, crowd, detailed categories | Real-time constraints                  |
+| SSD (VGG)                      | cars, people, furniture, large signals                             | Small objects, fine details            |
+| RetinaNet                      | traffic signs, pedestrians at distance, mixed-size objects         | Small objects, mobile constraints      |
+| YOLO (full)                    | people in crowds, mixed traffic, urban scenes                      | Subtle semantic attributes             |
+| YOLO-Tiny/Nano                 | traffic lights, road signs, license plates, faces, vehicles        | Deformable objects, subtle differences |
+| EfficientDet                   | traffic lights, road signs, pedestrians, cyclists                  | Abstract concepts                      |
+| MobileNet-SSD                  | traffic lights, road signs, cars, people                           | Small objects, crowd                   |
+
+| Detector                       | Typical input | Model size | FPS (CPU) | FPS (Acc) |
+|--------------------------------|---------------|------------|-----------|-----------|
+| Faster R-CNN                   | 600-1000      | 160 MB     | 0.5-3     | 5-15      |
+| SSD (VGG)                      | 300x300       | 136 MB     | 1-8       | 10-30     |
+| RetinaNet                      | 512-640       | 145 MB     | 1-6       | 10-25     |
+| YOLO (full)                    | 640x640       | 50-200 MB  | 2-15      | 20-60     |
+| YOLO-Tiny/Nano                 | 320-640       | 3-15 MB    | 5-25      | 20-90     |
+| EfficientDet                   | 512-640       | 15-30 MB   | 2-12      | 10-40     |
+| MobileNet-SSD                  | 320x320       | 10-15 MB   | 5-30      | 15-60     |
+
+| Detector                       | CPU                           | GPU                      | NPU             | RAM         |
+|--------------------------------|-------------------------------|--------------------------|-----------------|-------------|
+| Faster R-CNN                   | Desktop, 8-16 cores           | Desktop, >8GB VRAM       | No support      | 1-2GB       |
+| SSD (VGG)                      | Desktop/laptop, 4-8 cores     | Desktop, >6GB VRAM       | No support      | 500-900 MB  |
+| RetinaNet                      | Desktop, 8-16 cores           | Desktop, >6GB VRAM       | Rare support    | 700-1200 MB |
+| YOLO (full)                    | Desktop/big mobile, 4-8 cores | Laptop/strong mobile GPU | Partial support | 400-900 MB  |
+| YOLO-Tiny/Nano                 | Mobile, 2-4 cores             | Mobile GPU optional      | Yes             | 80-200 MB   |
+| EfficientDet                   | Mobile, 4 cores               | Mobile GPU helpful       | Partial support | 200-400 MB  |
+| MobileNet-SSD                  | Mobile, 2-4 cores             | optional                 | Yes             | 100-250 MB  |
+
+SSDLite320 MobileNetV3-Large
