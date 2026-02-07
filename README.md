@@ -445,6 +445,8 @@ This project demonstrates a small on-device computer-vision feature: warning the
 
 Despite its simplicity, the problem reflects real-world constraints: imperfect visual input, ambiguity, latency, and the need for careful user feedback. For educational purposes, it provides a realistic scale. The focus of the project is not the feature itself, but the process of building a working vision system from raw data to a running mobile application.
 
+## Working principles
+
 The system uses a two-stage neural network pipeline. First, a detector searches the image for traffic-light devices and marks their location. Second, a classifier determines the state of the detected light, such as red or green.
 
 Both stages operate on individual images. Temporal behavior is handled outside the neural network using simple state logic. Because the model does not analyze video sequences directly, behaviors such as blinking yellow lights are intentionally out of scope.
@@ -455,9 +457,55 @@ Only after the behavior is understood and stable is the model exported and embed
 
 The dataset is built from openly licensed stock footage and dashcam-style videos that permit reuse. No proprietary sources are used. Dataset creation is treated as a first-class part of the project, reflecting a skill that is essential in real-world machine-learning work.
 
-## Working principles
-
 ![Conceptual pipeline](cv_demo/conceptual-pipeline.png)
+
+## Preparing the dataset to train the network
+
+To train the network we would use the already taken opensource dashcam videos. We could not use YouTube videos and Google Maps street view photos because there's some legal issues and gray zones, but you may found lots of the videos yourself at:
+
+- https://www.pexels.com
+- https://pixbay.com
+- https://www.freepik.com
+
+and other similar places. Try to find 10-15 videos with city. Try to find the different kinds of traffic lights with different environment.
+
+To mark up the images we would use the CVAT. It's a most popular software that used in the ANN training. Despite CVAT is popular and provide lots of features, it's not convenient in use and installation. It's a web applivation, that could be launched in Docker container.
+
+This manual is for Linux, but generally, you could launch it everywhere. The system requirements and pre-requesites:
+
+- git
+- Docker >= 20.x
+- Docker Compose v2
+- 8 .. 16 GB RAM recommended
+
+According to Arch linux:
+
+```
+$> sudo pacman -S git docker docker-compose
+$> git --version
+git version 2.53.0
+
+$> docker --version
+Docker version 29.2.1, build a5c7197d72
+
+$> docker compose version
+Docker Compose version 5.0.2
+
+```
+
+We will install and launch the CVAT from the repository, so change directory to somewhere and:
+
+```
+$> git clone https://github.com/opencv/cvat.git
+$> cd cvat
+$> git tag              # pick up the latest stable tag
+$> git checkout v2.56.1 # or another stable tag
+$> docker compose up -d
+```
+
+## Constructing the Demo application
+
+## Building and training the ANN
 
 | Detector                       | Typical objects                                                    | Troubles with                          |
 |--------------------------------|--------------------------------------------------------------------|----------------------------------------|
@@ -489,4 +537,8 @@ The dataset is built from openly licensed stock footage and dashcam-style videos
 | EfficientDet                   | Mobile, 4 cores               | Mobile GPU helpful       | Partial support | 200-400 MB  |
 | MobileNet-SSD                  | Mobile, 2-4 cores             | optional                 | Yes             | 100-250 MB  |
 
-SSDLite320 MobileNetV3-Large
+## Embedding the ANN into the Demo application
+
+## Android application
+
+## Embedding the ANN into the Android Application
