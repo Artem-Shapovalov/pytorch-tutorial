@@ -515,14 +515,16 @@ $> git clone https://github.com/opencv/cvat.git
 $> cd cvat
 $> git tag                   # pick up the latest stable tag
 $> git checkout v2.56.1      # or another stable tag
-$> sudo docker compose up -d # download all necessary items to launch the image
+$> sudo docker compose up -d # download all necessary items to launch the images
 $> sudo docker compose ps    # see the running containers, there should be lots of cvat_*
 # Add the user to CVAT
-$> sudo docker exec -it cvat_server bach -ic 'python3 ~manage.py createsuperuser`
+$> sudo docker exec -it cvat_server bash -ic 'python3 ~manage.py createsuperuser`
 # There would be the several steps in interactive mode.
 ```
 
-As this is done in your browser open http://localhost:8080 and login with credentials you're entered during the adding superuser to CVAT.
+As this is done in your browser open http://localhost:8080 and login with credentials you're entered during the adding superuser to CVAT. After reboot these containers remains in place and your CVAT installation always ready to go. Because we up the container in -d mode.
+
+TODO: provide some info about how to shut it down.
 
 There's a time to prepare CVAT to our labeling work. Here, what we want as output:
 
