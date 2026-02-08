@@ -538,17 +538,17 @@ Keeping this in mind we should to make the project here:
 ![Creating a new project](cv_demo/CVAT_creating_project_2.png)
 
 3. Set up the labels, that should used in this project.
-3.1 Click `Add label`
-![Adding label](cv_demo/CVAT_adding_label_1.png)
-3.2. In opened tab enter `traffic_light` in `Label name` text field.
-3.3. Click on the `Any` combo box and select `Rectangle`.
-3.4. Click on color selector and select the most contrasting color you want. I prefer bright green.
-3.5. Click on `Add an attributre (+)` button. The one more fiels would appear
-3.5.1. In `Name` enter `state`.
-3.5.2. In next combo box select `Radio`
-3.5.3. Click on `Attribute values` and type, hitting enter after each item in list: `green`, `not_green`, `turned_off`
-3.6. Click `Continue` button
-![Adding label](cv_demo/CVAT_adding_label_2.png)
+    3.1 Click `Add label`
+    ![Adding label](cv_demo/CVAT_adding_label_1.png)
+    3.2. In opened tab enter `traffic_light` in `Label name` text field.
+    3.3. Click on the `Any` combo box and select `Rectangle`.
+    3.4. Click on color selector and select the most contrasting color you want. I prefer bright green.
+    3.5. Click on `Add an attributre (+)` button. The one more fiels would appear
+        3.5.1. In `Name` enter `state`.
+        3.5.2. In next combo box select `Radio`
+        3.5.3. Click on `Attribute values` and type, hitting enter after each item in list: `green`, `not_green`, `turned_off`
+    3.6. Click `Continue` button
+    ![Adding label](cv_demo/CVAT_adding_label_2.png)
 4. Navigate to the `Projects` again, select the `cv_demo` project and see the new attribute appeared.
 ![Adding label](cv_demo/CVAT_adding_lavel_3.png)
 
