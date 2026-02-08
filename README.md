@@ -491,6 +491,21 @@ Docker version 29.2.1, build a5c7197d72
 $> docker compose version
 Docker Compose version 5.0.2
 
+$> sudo systemctl start docker.service
+$> sudo systemctl enable docker.service
+$> sudo usermode -aG docker $USER
+$> newgrp docker # just to make effect immediately without logging out
+$> docker run hello-world # check the installation
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+17eec7bbc9d7: Pull complete 
+ea52d2000f90: Download complete 
+Digest: sha256:05813aedc15fb7b4d732e1be879d3252c1c9c25d885824f6295cab4538cb85cd
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+$> exit
 ```
 
 We will install and launch the CVAT from the repository, so change directory to somewhere and:
@@ -498,10 +513,63 @@ We will install and launch the CVAT from the repository, so change directory to 
 ```
 $> git clone https://github.com/opencv/cvat.git
 $> cd cvat
-$> git tag              # pick up the latest stable tag
-$> git checkout v2.56.1 # or another stable tag
-$> docker compose up -d
+$> git tag                   # pick up the latest stable tag
+$> git checkout v2.56.1      # or another stable tag
+$> sudo docker compose up -d # download all necessary items to launch the image
+$> sudo docker compose ps    # see the running containers, there should be lots of cvat_*
+# Add the user to CVAT
+$> sudo docker exec -it cvat_server bach -ic 'python3 ~manage.py createsuperuser`
+# There would be the several steps in interactive mode.
 ```
+
+As this is done in your browser open http://localhost:8080 and login with credentials you're entered during the adding superuser to CVAT.
+
+There's a time to prepare CVAT to our labeling work. Here, what we want as output:
+
+1. Detector dataset: full frames of videos as inputs, bounding boxes with traffic lights as outputs.
+2. Classifier dataset: cropped boxed as input and some class of image as output (`green`, `not_green`, `turned_off`).
+
+Keeping this in mind we should to make the project here:
+
+1. Go to the `Projects` tab, find `+` button and select `+ Create a new project`
+![Creating a new project](cv_demo/CVAT_creating_project_1.png)
+
+2. In opened window fill the name of the project, in my case it's `cv_demo` and push `Submint & Open` button
+![Creating a new project](cv_demo/CVAT_creating_project_2.png)
+
+3. Set up the labels, that should used in this project.
+3.1 Click `Add label`
+![Adding label](cv_demo/CVAT_adding_label_1.png)
+3.2 In opened tab enter `traffic_light` in `Label name` text field.
+3.3 Click on the `Any` combo box and select `Rectangle`.
+3.4 Click on color selector and select the most contrasting color you want. I prefer bright green.
+3.5 Click on `Add an attributre (+)` button. The one more fiels would appear
+3.5.1 In `Name` enter `state`.
+3.5.2 In next combo box select `Radio`
+3.5.3 Click on `Attribute values` and type, hitting enter after each item in list: `green`, `not_green`, `turned_off`
+3.6 Click `Continue` button
+![Adding label](cv_demo/CVAT_adding_label_2.png)
+4. Navigate to the `Projects` again, select the `cv_demo` project and see the new attribute appeared.
+![Adding label](cv_demo/CVAT_adding_lavel_3.png)
+
+Next stage is load the videos and make them taggable. CVAT is designed as collaboration tool, so each video or bunch of images would be the set of the task, like in Jira, actually.
+
+1. Go to the `Tasks` tab
+2. Find `+` icon and click on it. Click on `+ Create a new task` button.
+![Adding task](cv_demo/CVAT_adding_task_1.png)
+3. In opened frame select the task name, f.e. `video_1`
+4. Select `cv_demo` project from drop-down list
+5. Drag and drop the video file.
+6. Click `Submit & Open` button
+![Adding task](cv_demo/CVAT_adding_task_2.png)
+7. Wait for a while, CVAT reloads the page and you'll see the created task.
+![Adding task](cv_demo/CVAT_adding_task_3.png)
+
+Do the same for each video file. To speed up you may push `Submit & Continue` instead of `Submit & Open`. This way the window refreshes at the end of the video import and the `Project` field remains with `cv_demo` selected.
+
+As result your `Tasks` page should became something like this:
+
+![Adding task](cv_demo/CVAT_adding_task_4.png)
 
 ## Constructing the Demo application
 
